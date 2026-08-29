@@ -1,30 +1,40 @@
-package db
+package main
 
 import (
-	"context"
-	"database/sql"
-	"fmt"
-	"time"
+	"log"
+	"net/http"
+	"os"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/Astronicle/poryflux/backend/internal/db"
+	"github.com/joho/godotenv"
 )
 
-func Connect(databaseURL string) (*sql.DB, error) {
-	db, err := sql.Open("pgx", databaseURL)
+func main() {
+	_ = godotenv.Load() // fine if .env is missing in prod; env vars still work
+
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		log.Fatal("DATABASE_URL not set")
+	}
+
+	conn, err := db.Connect(dbURL)
 	if err != nil {
-		return nil, fmt.Errorf("opening db: %w", err)
+		log.Fatalf("db connect failed: %v", err)
 	}
+	defer conn.Close()
 
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(5)
-	db.SetConnMaxLifetime(30 * time.Minute)
+	log.Println("connected to postgres")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
 
-	if err := db.PingContext(ctx); err != nil {
-		return nil, fmt.Errorf("pinging db: %w", err)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
-
-	return db, nil
+	log.Printf("listening on :%s", port)
+	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
