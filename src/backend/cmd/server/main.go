@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	_ = godotenv.Load() // fine if .env is missing in prod; env vars still work
+	_ = godotenv.Load()
 
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
