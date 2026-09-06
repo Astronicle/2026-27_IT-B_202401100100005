@@ -42,20 +42,35 @@ PoryFlux focuses on **security, performance, concurrency, and scalability**.
 
 ### Database
 
-* TBD
+* PostgreSQL
 
 ### Security
 
 * File Encryption
 * Secure Authentication
 * Access Control
+## Requirements
+
+The following tools are required to run the project:
+
+* Docker
+* Docker Compose
+* Git
+
+For local development without Docker, the following may also be required:
+
+* Go
+* Node.js
+* pnpm
+* PostgreSQL
 
 ## Project Structure
-
-```text
+```
 PoryFlux/
 │
 ├── README.md
+├── Makefile
+├── docker-compose.yaml
 │
 ├── docs/
 │   ├── SRS/
@@ -64,11 +79,142 @@ PoryFlux/
 ├── src/
 │   ├── frontend/
 │   └── backend/
+│       ├── migrations/
+│       ├── .env.example
+│       └── Dockerfile
 │
 ├── test/
 │
 └── .gitignore
 ```
+## Docker Compose Usage
+
+The project uses Docker Compose to run the complete application stack:
+
+Frontend
+   ↓
+Backend
+   ↓
+PostgreSQL
+
+From the project root, build and start all services:
+
+* docker compose up --build
+
+To run the services in the background:
+
+* docker compose up --build -d
+
+To stop the services:
+
+* docker compose down
+
+To stop the services without removing the PostgreSQL data volume:
+
+* docker compose down
+
+The PostgreSQL data is stored in a named Docker volume so that database data persists when containers are recreated.
+## Useful Tips-->
+
+The applications can be accessed locally at:
+
+Frontend: http://localhost:3000
+Backend:  http://localhost:8080
+PostgreSQL: localhost:5432
+## Database Migrations
+
+PoryFlux uses database migration files to manage changes to the PostgreSQL database.
+
+The current migration structure is intentionally kept unchanged. The existing 0001_init migration creates the required database tables.
+
+Migration commands are provided through the project Makefile.
+
+* Apply pending migrations:
+
+make migrate-up
+
+* Rollback the most recent migration:
+
+make migrate-down
+
+* Migration files are located at:
+
+src/backend/migrations/
+
+## Fresh Clone Flow -->
+
+A new developer can set up the project using the following steps:
+
+git clone <repo>
+cd 2026-27_IT-B_202401100100005
+
+cp src/backend/.env.example src/backend/.env
+
+Update the required secrets in:
+
+src/backend/.env
+
+Then start the complete application:
+
+docker compose up --build
+
+After the containers start:
+
+Frontend → http://localhost:3000
+Backend  → http://localhost:8080
+Database → localhost:5432
+## Troubleshooting
+* Check running containers
+docker compose ps
+* View service logs
+docker compose logs
+
+* View backend logs:
+
+docker compose logs backend
+
+* View PostgreSQL logs:
+
+docker compose logs postgres
+* Rebuild containers
+If Docker changes are not reflected:
+
+docker compose up --build
+
+* PostgreSQL is not ready
+Check PostgreSQL health/status:
+
+docker compose ps
+
+The backend depends on PostgreSQL being healthy before starting.
+
+* Stop and recreate containers
+docker compose down
+docker compose up --build
+
+( If you need to completely reset the development database, the PostgreSQL Docker volume can be removed. This permanently deletes the stored database data, so use this only when a database reset is intended.)
+## Why We Use Docker Compose
+
+Dockerfiles define how individual container images are built, but they do not manage multiple containers together.
+
+PoryFlux has three services:
+
+* PostgreSQL
+* Go Backend
+* Next.js Frontend
+
+Without Docker Compose, we would have to manually create networks, run containers, configure environment variables, ports, volumes, and service connections.
+
+With Docker Compose, everything is defined in one `docker-compose.yaml` file and started with:
+
+```bash
+docker compose up --build
+```
+
+
+**Dockerfile = builds one image**
+
+**Docker Compose = runs and connects multiple services**
 
 ## Goals
 
