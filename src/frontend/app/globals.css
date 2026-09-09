@@ -1,26 +1,169 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ——— PoryFlux tokens: light ——— */
+:root {
+  --bg: #f4f4f0;
+  --surface: #fafaf7;
+  --elev: #ffffff;
+  --ink: #111111;
+  --ink2: #5f6266;
+  --line: #d6d7d2;
+  --blue: #3c8dff;
+  --blue-deep: #1554b8;
+  --cyan: #00d9ff;
+  --purple: #7657ff;
+  --ok: #36d98b;
+  --err: #ff4d5a;
+  --grid-dot: rgba(17, 17, 17, 0.14);
+  --hero-wash: rgba(60, 141, 255, 0.08);
+}
+
+/* ——— PoryFlux tokens: dark (same system, inverted) ——— */
+.dark {
+  --bg: #0d0f12;
+  --surface: #15181d;
+  --elev: #1b1f25;
+  --ink: #f3f4f1;
+  --ink2: #9a9ea5;
+  --line: #2b3037;
+  --blue: #4a9bff;
+  --blue-deep: #4a9bff;
+  --cyan: #00d9ff;
+  --purple: #806bff;
+  --ok: #36d98b;
+  --err: #ff4d5a;
+  --grid-dot: rgba(243, 244, 241, 0.12);
+  --hero-wash: rgba(74, 155, 255, 0.1);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--blue);
+  color: #fff;
+}
+
+/* thin technical scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--blue);
+}
+
+/* ——— construction grid backdrop (strategic, not everywhere) ——— */
+.dotgrid {
+  background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.ruled {
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+/* ——— motion (restrained) ——— */
+@keyframes px-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes px-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(9px, -13px);
+    opacity: 0.35;
+  }
+}
+
+@keyframes px-blink {
+  0%,
+  60% {
+    opacity: 1;
+  }
+  61%,
+  100% {
+    opacity: 0.15;
+  }
+}
+
+@keyframes px-dash {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+@keyframes px-spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes px-progress {
+  from {
+    width: 8%;
+  }
+  to {
+    width: 72%;
+  }
+}
+
+.anim-float {
+  animation: px-float 7s ease-in-out infinite;
+}
+.anim-drift {
+  animation: px-drift 6s ease-in-out infinite;
+}
+.anim-blink {
+  animation: px-blink 1.6s steps(1) infinite;
+}
+.anim-dash {
+  stroke-dasharray: 6 8;
+  animation: px-dash 2.4s linear infinite;
+}
+.anim-spin-slow {
+  animation: px-spin-slow 46s linear infinite;
+  transform-origin: center;
+}
+
+/* crisp pixel edges */
+.pixelated {
+  image-rendering: pixelated;
+  shape-rendering: crispEdges;
 }
