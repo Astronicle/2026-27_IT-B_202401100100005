@@ -12,7 +12,7 @@ function LoginInner() {
   const router = useRouter();
   const search = useSearchParams();
   const next = search.get("next") ?? "/transfer";
-  const { refresh } = useAuth();
+  const { user, loading, refresh } = useAuth();
 
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
@@ -36,6 +36,15 @@ function LoginInner() {
     }
   };
 
+  const signOut = async () => {
+    try {
+      await api.logout();
+    } catch {
+      /* ignore */
+    }
+    await refresh();
+  };
+
   return (
     <div className="mx-auto grid w-full max-w-5xl gap-10 md:grid-cols-12">
       <div className="md:col-span-5">
@@ -49,6 +58,42 @@ function LoginInner() {
         <p className="mt-6 font-mono text-[10px] tracking-[0.22em] text-[var(--ink2)]">CONNECTION SECURE · AES-256</p>
       </div>
       <div className="md:col-span-6 md:col-start-7">
+        {loading ? (
+          <div aria-label="Loading" className="h-96 animate-pulse border border-[var(--line)] bg-[var(--surface)]" />
+        ) : user ? (
+          <div className="border border-[var(--line)] bg-[var(--surface)]">
+            <p className="border-b border-[var(--line)] px-6 py-3 font-mono text-[11px] tracking-[0.22em] text-[var(--ink2)] md:px-8">
+              ACCOUNT
+            </p>
+            <dl className="divide-y divide-[var(--line)] p-6 font-mono text-xs md:p-8">
+              {[
+                ["STATUS", "SIGNED IN"],
+                ["EMAIL", user.email],
+                ["USER ID", user.id],
+                ["MEMBER SINCE", user.created_at],
+              ].map(([k, v]) => (
+                <div key={k} className="flex justify-between gap-4 py-2.5">
+                  <dt className="shrink-0 text-[var(--ink2)]">{k}</dt>
+                  <dd className="truncate text-right">{v}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="flex gap-3 p-6 pt-0 md:px-8 md:pb-8">
+              <Link
+                href="/transfer"
+                className="flex-1 bg-[var(--blue)] px-6 py-3.5 text-center text-xs font-bold tracking-wide text-white transition-transform hover:-translate-y-px"
+              >
+                OPEN APP →
+              </Link>
+              <button
+                onClick={() => void signOut()}
+                className="flex-1 border border-[var(--line)] px-6 py-3.5 text-xs font-bold tracking-wide transition-colors hover:border-[var(--err)] hover:text-[var(--err)]"
+              >
+                SIGN OUT
+              </button>
+            </div>
+          </div>
+        ) : (
         <div className="border border-[var(--line)] bg-[var(--surface)]">
           <div className="flex gap-px border-b border-[var(--line)] bg-[var(--line)]">
             {(["login", "register"] as const).map((m) => (
@@ -109,6 +154,7 @@ function LoginInner() {
             </p>
           </form>
         </div>
+        )}
       </div>
     </div>
   );

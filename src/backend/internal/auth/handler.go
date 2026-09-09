@@ -108,7 +108,11 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
-		SameSite: http.SameSiteLaxMode,
+		// None (not Lax): the frontend lives on a different origin
+		// (:3000 vs :8080), and Lax cookies are never attached to
+		// cross-site fetch/XHR. Attributes must match setAuthCookie
+		// or the browser will not delete the cookie.
+		SameSite: http.SameSiteNoneMode,
 		MaxAge:   -1,
 	})
 	w.WriteHeader(http.StatusNoContent)
@@ -137,7 +141,11 @@ func setAuthCookie(w http.ResponseWriter, token string, ttl time.Duration) {
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
-		SameSite: http.SameSiteLaxMode,
+		// None (not Lax): the frontend lives on a different origin
+		// (:3000 vs :8080), and Lax cookies are never attached to
+		// cross-site fetch/XHR. Browsers accept Secure cookies from
+		// http://localhost (secure context), so local dev keeps working.
+		SameSite: http.SameSiteNoneMode,
 		MaxAge:   int(ttl.Seconds()),
 	})
 }

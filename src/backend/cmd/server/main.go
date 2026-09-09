@@ -84,10 +84,15 @@ func main() {
 	// expiry + revocation enforced).
 	mux.HandleFunc("GET /s/{token}", fileHandler.PublicDownload)
 
+	// CORS must wrap the whole mux: browsers preflight cross-origin
+	// requests with OPTIONS, which the method-based mux patterns above
+	// would otherwise reject before any handler runs.
+	cors := middleware.CORS(middleware.ParseCORSOrigins(os.Getenv("CORS_ORIGINS")))
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 	log.Printf("listening on :%s", port)
-	log.Fatal(http.ListenAndServe(":"+port, mux))
+	log.Fatal(http.ListenAndServe(":"+port, cors(mux)))
 }
