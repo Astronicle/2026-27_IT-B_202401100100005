@@ -11,7 +11,7 @@ import (
 	"github.com/Astronicle/poryflux/backend/internal/models"
 )
 
-const cookieName = "auth_token"
+const CookieName = "auth_token"
 
 type Handler struct {
 	service *Service
@@ -103,7 +103,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     cookieName,
+		Name:     CookieName,
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
@@ -132,7 +132,7 @@ func (h *Handler) Me(w http.ResponseWriter, r *http.Request) {
 
 func setAuthCookie(w http.ResponseWriter, token string, ttl time.Duration) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     cookieName,
+		Name:     CookieName,
 		Value:    token,
 		Path:     "/",
 		HttpOnly: true,
