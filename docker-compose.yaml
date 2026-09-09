@@ -29,6 +29,9 @@ services:
       DATABASE_URL: postgres://user:pass@postgres:5432/poryflux_db?sslmode=disable
       JWT_SECRET: ${JWT_SECRET}
       MASTER_KEY: ${MASTER_KEY}
+      STORAGE_DIR: /app/storage
+    volumes:
+      - backend_data:/app/storage
     ports:
       - "8080:8080"
     depends_on:
@@ -47,4 +50,5 @@ services:
       - backend
 
 volumes:
-  pgdata: 
+  pgdata:
+  backend_data:

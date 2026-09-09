@@ -21,4 +21,7 @@ Thumbs.db
 .idea/
 *.pem
 *.exe
+# Encrypted file blobs (local storage dir) must never be committed.
+storage/
+src/backend/storage/
 
